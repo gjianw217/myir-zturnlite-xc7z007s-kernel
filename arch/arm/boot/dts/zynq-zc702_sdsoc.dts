@@ -1,0 +1,544 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ *  Copyright (C) 2011 - 2015 Xilinx
+ *  Copyright (C) 2012 National Instruments Corp.
+ */
+/dts-v1/;
+#include "zynq-7000.dtsi"
+// #include "zturn-pl-tpg.dtsi"
+// #include "zturn-pl-hdmi.dtsi"
+
+/ {
+	model = "Zynq ZC702 Development Board";
+	compatible = "xlnx,zynq-zc702", "xlnx,zynq-7000";
+
+	aliases {
+		ethernet0 = &gem0;
+		i2c0 = &i2c0;
+		serial0 = &uart1;
+		spi0 = &qspi;
+		mmc0 = &sdhci0;
+		// usb0 = &usb0;
+	};
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/ram cma=25M rw earlyprintk";
+		stdout-path = "serial0:115200n8";
+	};
+
+	// gpio-keys {
+	// 	compatible = "gpio-keys";
+	// 	autorepeat;
+	// 	sw14 {
+	// 		label = "sw14";
+	// 		gpios = <&gpio0 12 0>;
+	// 		linux,code = <108>; /* down */
+	// 		wakeup-source;
+	// 		autorepeat;
+	// 	};
+	// 	sw13 {
+	// 		label = "sw13";
+	// 		gpios = <&gpio0 14 0>;
+	// 		linux,code = <103>; /* up */
+	// 		wakeup-source;
+	// 		autorepeat;
+	// 	};
+	// };
+
+	// leds {
+	// 	compatible = "gpio-leds";
+
+	// 	ds23 {
+	// 		label = "ds23";
+	// 		gpios = <&gpio0 10 0>;
+	// 		linux,default-trigger = "heartbeat";
+	// 	};
+	// };
+
+	gpio-leds {
+		compatible = "gpio-leds";
+
+		led_r {
+			label = "led_r";
+			gpios = <0x4 0x72 0x1>;
+			default-state = "off";
+			linux,default-trigger = "heartbeat";
+		};
+
+		led_g {
+			label = "led_g";
+			gpios = <0x4 0x73 0x1>;
+			default-state = "off";
+			linux,default-trigger = "heartbeat";
+		};
+
+		led_b {
+			label = "led_b";
+			gpios = <0x4 0x74 0x1>;
+			default-state = "on";
+			linux,default-trigger = "heartbeat";
+		};
+
+		usr_led1 {
+			label = "usr_led1";
+			gpios = <0x4 0x0 0x1>;
+			default-state = "off";
+			linux,default-trigger = "none";
+		};
+
+		usr_led2 {
+			label = "usr_led2";
+			gpios = <0x4 0x9 0x1>;
+			default-state = "off";
+			linux,default-trigger = "none";
+		};
+	};
+
+	gpio-beep {
+		compatible = "gpio-beeper";
+		lable = "pl-beep";
+		gpios = <0x4 0x75 0x0>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		autorepeat;
+
+		K1 {
+			label = "K1";
+			gpios = <0x4 0x32 0x1>;
+			linux,code = <0x66>;
+			gpio-key,wakeup;
+			autorepeat;
+		};
+	};
+
+	usb_phy0: phy0@e0002000 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0xe0002000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+	};
+
+	usb_phy1: usb_phy@0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0x0>;
+		reset-gpios = <0x6 0x2e 0x1>;
+	};
+
+	uio@0 {
+		compatible = "generic-uio";
+		status = "okay";
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		interrupts = <0 33 1>;
+	};
+
+	uio@1 {
+		compatible = "generic-uio";
+		status = "okay";
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		interrupts = <0 34 2>;
+	};
+
+	uio@2 {
+		compatible = "generic-uio";
+		status = "okay";
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		interrupts = <0 35 4>;
+	};
+
+	uio@3 {
+		compatible = "generic-uio";
+		status = "okay";
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		interrupts = <0 36 8>;
+	};
+
+	uio@4 {
+		compatible = "generic-uio";
+		status = "okay";
+		interrupt-controller;
+		interrupt-parent = <&intc>;
+		interrupts = <0 37 8>;
+	};
+
+	xlnk {
+		compatible = "xlnx,xlnk-1.0";
+		clock-names = "clk166", "clk150", "clk100", "clk200";
+		clocks = <&clkc 15>, <&clkc 16>, <&clkc 17>, <&clkc 18>;
+	};
+};
+
+&sdhci0 {
+	status = "okay";
+};
+
+// &sdhci1 {
+// 	status = "okay";
+// };
+
+&gem0 {
+	local-mac-address = [00 0a 35 00 00 00];
+	phy-mode = "rgmii-id";
+	status = "okay";
+	xlnx,ptp-enet-clock = <0x69f6bcb>;
+};
+
+&can0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_can0_default>;
+};
+
+&clkc {
+	ps-clk-frequency = <33333333>;
+};
+
+&gpio0 {
+	compatible = "xlnx,zynq-gpio-1.0";
+	#gpio-cells = <0x2>;
+	clocks = <0x1 0x2a>;
+	gpio-controller;
+	interrupt-parent = <0x3>;
+	interrupts = <0x0 0x14 0x4>;
+	reg = <0xe000a000 0x1000>;
+	emio-gpio-width = <0x40>;
+	gpio-mask-high = <0x0>;
+	gpio-mask-low = <0x5600>;
+	xlnx,emio-gpio-width = <0x40>;
+	xlnx,mio-gpio-mask = <0x5600>;
+	linux,phandle = <0x4>;
+	phandle = <0x4>;
+};
+
+&i2c0 {
+	compatible = "cdns,i2c-r1p10";
+	status = "okay";
+	clocks = <0x1 0x26>;
+	interrupt-parent = <0x3>;
+	interrupts = <0x0 0x19 0x4>;
+	reg = <0xe0004000 0x1000>;
+	#address-cells = <0x1>;
+	#size-cells = <0x0>;
+	clock-frequency = <0x61a80>;
+	xlnx,has-interrupt = <0x1>;
+
+	adxl345@53 {
+		compatible = "adi,adxl345";
+		reg = <0x53>;
+		interrupt-parent = <0x3>;
+		interrupts = <0x0 0x1f 0x4>;
+	};
+
+	stlm75@49 {
+		status = "okay";
+		compatible = "national,lm75";
+		reg = <0x49>;
+		interrupts = <0x0 0x20 0x4>;
+	};
+
+	ov5640: camera@3c {
+		compatible = "alinx,ov5640";
+		reg = <0x3c>;
+
+		reset-gpios = <&gpio0 54 1>;
+
+		status = "disable";
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			xlnx,video-format = <2>;
+			xlnx,video-width = <8>;
+
+			ov5640_out: endpoint {
+				// remote-endpoint = <&vcap_in>;
+			};
+		};
+	};
+
+	sii902x@3b {
+		compatible = "sii902x";
+		reg = <0x3b>;
+		interrupt-parent = <0x3>;
+		interrupts = <0x0 29 0x4>;
+		mode_str = "1920x1080";
+		bits-per-pixel = <0x10>;
+	};
+
+	// ov2659: camera@30 {
+	// 	compatible = "alinx,ov2659";
+	// 	reg = <0x30>;
+
+	// 	reset-gpios = <&gpio0 54 1>;
+
+	// 	status = "disable";
+
+	// 	#address-cells = <1>;
+	// 	#size-cells = <0>;
+
+	// 	port@0 {
+	// 		reg = <0>;
+
+	// 		xlnx,video-format = <2>;
+	// 		xlnx,video-width = <8>;
+
+	// 		ov2659_out: endpoint {
+	// 			remote-endpoint = <&vcap_in>;
+	// 		};
+	// 	};
+	// };
+};
+
+// &video_cap {
+// 	compatible = "xlnx,video";
+//  status = "disable";
+
+// 	dmas = <&axi_vdma_1 0>;
+// 	dma-names = "port0";
+
+// 	ports {
+// 		#address-cells = <1>;
+// 		#size-cells = <0>;
+
+// 		port@0 {
+// 			reg = <0>;
+// 			direction = "input";
+
+// 			vcap_in: endpoint {
+// 				remote-endpoint = <&ov5640_out>;
+// 			};
+// 		};
+// 	};
+// };
+
+&i2c1 {
+	compatible = "cdns,i2c-r1p10";
+	status = "okay";
+	clocks = <0x1 0x27>;
+	interrupt-parent = <0x3>;
+	interrupts = <0x0 0x30 0x4>;
+	reg = <0xe0005000 0x1000>;
+	#address-cells = <0x1>;
+	#size-cells = <0x0>;
+	clock-frequency = <0x61a80>;
+	xlnx,has-interrupt = <0x1>;
+
+	ft0x5x_ts@38 {
+		compatible = "ft5x06_ts";
+		reg = <0x38>;
+		tp_int = <0x4 106 0x1>;
+		tp_resetn = <0x4 107 0x1>;
+		pwr_en = <&gpio0 108 1>;
+		bl_en = <&gpio0 109 1>;	
+		polling_mode = [00];
+		multi_touch = [00];
+	};
+};
+
+&pinctrl0 {
+	pinctrl_can0_default: can0-default {
+		mux {
+			function = "can0";
+			groups = "can0_9_grp";
+		};
+
+		conf {
+			groups = "can0_9_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+
+		conf-rx {
+			pins = "MIO46";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO47";
+			bias-disable;
+		};
+	};
+
+	pinctrl_gpio0_default: gpio0-default {
+		mux {
+			function = "gpio0";
+			groups = "gpio0_7_grp", "gpio0_8_grp", "gpio0_9_grp",
+				 "gpio0_10_grp", "gpio0_11_grp", "gpio0_12_grp",
+				 "gpio0_13_grp", "gpio0_14_grp";
+		};
+
+		conf {
+			groups = "gpio0_7_grp", "gpio0_8_grp", "gpio0_9_grp",
+				 "gpio0_10_grp", "gpio0_11_grp", "gpio0_12_grp",
+				 "gpio0_13_grp", "gpio0_14_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+
+		conf-pull-up {
+			pins = "MIO9", "MIO10", "MIO11", "MIO12", "MIO13", "MIO14";
+			bias-pull-up;
+		};
+
+		conf-pull-none {
+			pins = "MIO7", "MIO8";
+			bias-disable;
+		};
+	};
+
+	pinctrl_i2c0_default: i2c0-default {
+		mux {
+			groups = "i2c0_10_grp";
+			function = "i2c0";
+		};
+
+		conf {
+			groups = "i2c0_10_grp";
+			bias-pull-up;
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+	};
+
+	pinctrl_i2c0_gpio: i2c0-gpio {
+		mux {
+			groups = "gpio0_50_grp", "gpio0_51_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_50_grp", "gpio0_51_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+	};
+
+	pinctrl_uart1_default: uart1-default {
+		mux {
+			groups = "uart1_10_grp";
+			function = "uart1";
+		};
+
+		conf {
+			groups = "uart1_10_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+
+		conf-rx {
+			pins = "MIO49";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO48";
+			bias-disable;
+		};
+	};
+
+	pinctrl_usb0_default: usb0-default {
+		mux {
+			groups = "usb0_0_grp";
+			function = "usb0";
+		};
+
+		conf {
+			groups = "usb0_0_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+
+		conf-rx {
+			pins = "MIO29", "MIO31", "MIO36";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO28", "MIO30", "MIO32", "MIO33", "MIO34",
+			       "MIO35", "MIO37", "MIO38", "MIO39";
+			bias-disable;
+		};
+	};
+};
+
+&qspi {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+	is-dual = <0>;
+	num-cs = <1>;
+	flash@0 {
+				compatible = "n25q128";
+				reg = <0x0>;
+				spi-tx-bus-width = <0x1>;
+				spi-rx-bus-width = <0x4>;
+				spi-max-frequency = <0x2faf080>;
+				#address-cells = <0x1>;
+				#size-cells = <0x1>;
+
+				partition@qspi-boot {
+					label = "qspi-boot";
+					reg = <0x0 0x80000>;
+				};
+
+				partition@qspi-bootenv {
+					label = "qspi-bootenv";
+					reg = <0x80000 0x20000>;
+				};
+
+				partition@qspi-bitstream {
+					label = "qspi-bitstream";
+					reg = <0xa0000 0x460000>;
+				};
+
+				partition@qspi-kernel {
+					label = "qspi-kernel";
+					reg = <0x500000 0x480000>;
+				};
+
+				partition@qspi-devicetree {
+					label = "qspi-devicetree";
+					reg = <0x980000 0x10000>;
+				};
+
+				partition@qspi-rootfs {
+					label = "qspi-rootfs";
+					reg = <0x990000 0x600000>;
+				};
+
+				partition@qspi-data {
+					label = "data";
+					reg = <0xf90000 0x70000>;
+				};
+			};
+};
+
+&uart1 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1_default>;
+};
+
+&usb0 {
+	status = "okay";
+	dr_mode = "host";
+	usb-phy = <&usb_phy0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0_default>;
+};
