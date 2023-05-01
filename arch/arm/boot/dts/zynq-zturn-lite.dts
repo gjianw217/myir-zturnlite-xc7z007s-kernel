@@ -74,6 +74,9 @@
 
 &sdhci1 {
 	status = "okay";
+	/delete-property/ xlnx,has-wp;
+	/delete-property/ broken-cd;
+	/delete-property/ wp-inverted;
 };
 
 &sdhci0 {
@@ -82,6 +85,9 @@
 	xlnx,has-cd = <0x1>;
 	xlnx,has-power = <0x0>;
 	xlnx,has-wp = <0x1>;
+	/delete-property/ xlnx,has-wp;
+	/delete-property/ broken-cd;
+	/delete-property/ wp-inverted;
 	// pinctrl-names = "default";
 	// pinctrl-0 = <&pinctrl_sdhci0_default>;
 };
